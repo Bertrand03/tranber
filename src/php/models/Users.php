@@ -37,10 +37,37 @@ class Users extends Model
 		$data = [
 			':login'    => $login,
 			':email'    => $email,
-			':password' => $password,
+			':password' => \password_hash($password, \PASSWORD_DEFAULT),
 		];
 		$database = $this->getApp()->getDatabase();
 		return $database->query($sql, $data, false);
+	}
+
+	public function logIn(string $login, string $password)
+	{
+		$sql  = "SELECT * FROM users WHERE login=:login"; // Les deux points servent de mot clef.
+		$data = [
+			':login' => $login,
+		];
+		$database = $this->getApp()->getDatabase();
+		$user     = $database->query($sql, $data);
+
+		
+		// 1ere methode
+		//return ($user && array_key_exists(0, $user) && password_verify($password, $user[0]['password']))
+		//	? $user [0]
+		//	: null;
+
+		//}
+
+
+		// 2eme methode
+		if ($user && array_key_exists(0, $user) && password_verify($password, $user[0]['password'])){
+			return $user[0];
+		}
+		else {
+			return null;
+		}
 	}
 
 
